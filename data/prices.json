@@ -3,70 +3,70 @@
     "zip": "53711",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 235.5,
+    "price_per_sqft": 235,
     "median_price": 563413
   },
   {
     "zip": "53703",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 258.2,
+    "price_per_sqft": 258,
     "median_price": 610000
   },
   {
     "zip": "53719",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 228.7,
+    "price_per_sqft": 228,
     "median_price": 547000
   },
   {
     "zip": "53705",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 274.9,
+    "price_per_sqft": 274,
     "median_price": 625000
   },
   {
     "zip": "53704",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 210.3,
+    "price_per_sqft": 210,
     "median_price": 450000
   },
   {
     "zip": "53713",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 200.1,
+    "price_per_sqft": 200,
     "median_price": 425000
   },
   {
     "zip": "53718",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 220.8,
+    "price_per_sqft": 220,
     "median_price": 470000
   },
   {
     "zip": "53714",
     "city": "Madison",
     "state": "WI",
-    "price_per_sqft": 215.4,
+    "price_per_sqft": 215,
     "median_price": 460000
   },
   {
     "zip": "53593",
     "city": "Verona",
     "state": "WI",
-    "price_per_sqft": 240.7,
+    "price_per_sqft": 240,
     "median_price": 570000
   },
   {
     "zip": "53562",
     "city": "Middleton",
     "state": "WI",
-    "price_per_sqft": 270.5,
+    "price_per_sqft": 270,
     "median_price": 640000
   }
 ]
