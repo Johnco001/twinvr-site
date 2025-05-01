@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Comparison — FairHome</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6">
+
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">🏡 Smart Property Comparison Tool</h1>
+
+    <form id="comparisonForm" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <div class="bg-white p-6 rounded shadow">
+        <h2 class="text-xl font-semibold mb-4">Property A</h2>
+        <input id="areaA" type="text" placeholder="Area (City)" name="areaA" class="input" />
+        <input type="number" placeholder="Price in USD" name="priceA" class="input" />
+        <input type="number" placeholder="Sq Ft" name="sqftA" class="input" />
+        <select name="bedroomsA" class="input">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6+</option>
+        </select>
+        <select name="bathroomsA" class="input">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6+</option>
+        </select>
+        <select name="garageA" class="input">
+          <option value="0">No Garage</option>
+          <option value="1">1 Car</option>
+          <option value="2">2 Cars</option>
+          <option value="3">3+ Cars</option>
+        </select>
+        <select name="basementA" class="input">
+          <option value="0">No</option>
+          <option value="10">Yes</option>
+        </select>
+      </div>
+
+      <div class="bg-white p-6 rounded shadow">
+        <h2 class="text-xl font-semibold mb-4">Property B</h2>
+        <input id="areaB" type="text" placeholder="Area (City)" name="areaB" class="input" />
+        <input type="number" placeholder="Price in USD" name="priceB" class="input" />
+        <input type="number" placeholder="Sq Ft" name="sqftB" class="input" />
+        <select name="bedroomsB" class="input">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6+</option>
+        </select>
+        <select name="bathroomsB" class="input">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6+</option>
+        </select>
+        <select name="garageB" class="input">
+          <option value="0">No Garage</option>
+          <option value="1">1 Car</option>
+          <option value="2">2 Cars</option>
+          <option value="3">3+ Cars</option>
+        </select>
+        <select name="basementB" class="input">
+          <option value="0">No</option>
+          <option value="10">Yes</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="text-center">
+      <button onclick="compareProperties()" class="bg-blue-600 text-white px-8 py-3 rounded hover:bg-blue-700">Compare</button>
+    </div>
+
+    <div id="results" class="mt-10"></div>
+    <canvas id="chartCanvas" class="mt-10"></canvas>
+  </div>
+
+  <style>
+    .input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+    }
+  </style>
+
+  <script>
+    async function loadCityAutoComplete(id) {
+      const input = document.querySelector(`#${id}`);
+      new autoComplete({
+        selector: `#${id}`,
+        placeHolder: "Enter US city...",
+        data: {
+          src: async () => {
+            const query = input.value;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?city=${query}&country=us&format=json`);
+            const data = await res.json();
+            return data.map(item => `${item.display_name}`);
+          },
+          cache: false
+        },
+        resultItem: {
+          highlight: true
+        },
+        events: {
+          input: {
+            selection(event) {
+              input.value = event.detail.selection.value;
+            }
+          }
+        }
+      });
+    }
+
+    loadCityAutoComplete("areaA");
+    loadCityAutoComplete("areaB");
+
+    function compareProperties() {
+      const form = document.forms["comparisonForm"];
+      const A = {
+        price: +form["priceA"].value,
+        sqft: +form["sqftA"].value,
+        bedrooms: +form["bedroomsA"].value,
+        bathrooms: +form["bathroomsA"].value,
+        garage: +form["garageA"].value,
+        basement: +form["basementA"].value
+      };
+      const B = {
+        price: +form["priceB"].value,
+        sqft: +form["sqftB"].value,
+        bedrooms: +form["bedroomsB"].value,
+        bathrooms: +form["bathroomsB"].value,
+        garage: +form["garageB"].value,
+        basement: +form["basementB"].value
+      };
+
+      const score = p =>
+        (p.sqft > 0 ? 50 : 0) +
+        p.bedrooms * 10 +
+        p.bathrooms * 10 +
+        p.garage * 10 +
+        p.basement * 1;
+
+      const sqftPriceA = (A.sqft > 0 ? A.price / A.sqft : 0).toFixed(2);
+      const sqftPriceB = (B.sqft > 0 ? B.price / B.sqft : 0).toFixed(2);
+
+      const pointsA = score(A);
+      const pointsB = score(B);
+
+      document.getElementById("results").innerHTML = `
+        <div class="bg-white p-6 rounded shadow">
+          <h2 class="text-2xl font-semibold text-center mb-4">Comparison Summary</h2>
+          <div class="grid grid-cols-2 gap-4 text-center">
+            <div>
+              <p class="text-xl font-bold">Property A</p>
+              <p>Price per Sq Ft: <strong>$${sqftPriceA}</strong></p>
+              <p>Total Points: <strong>${pointsA}</strong></p>
+            </div>
+            <div>
+              <p class="text-xl font-bold">Property B</p>
+              <p>Price per Sq Ft: <strong>$${sqftPriceB}</strong></p>
+              <p>Total Points: <strong>${pointsB}</strong></p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const ctx = document.getElementById("chartCanvas").getContext("2d");
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Total Points', 'Price/SqFt'],
+          datasets: [
+            {
+              label: 'Property A',
+              data: [pointsA, sqftPriceA],
+              backgroundColor: 'rgba(59, 130, 246, 0.7)'
+            },
+            {
+              label: 'Property B',
+              data: [pointsB, sqftPriceB],
+              backgroundColor: 'rgba(16, 185, 129, 0.7)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
